@@ -7,6 +7,3 @@
 - [ ] Multiple Sessions
 - [ ] Multiple Tabs
 
-# Screenshots
-![image](https://github.com/user-attachments/assets/c5e468fa-2367-4f01-85e5-569435e8811d)
-
