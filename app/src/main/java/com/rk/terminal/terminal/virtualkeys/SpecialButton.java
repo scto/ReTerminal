@@ -1,4 +1,4 @@
-package com.termux.terminal.virtualkeys;
+package com.rk.terminal.terminal.virtualkeys;
 
 import androidx.annotation.NonNull;
 

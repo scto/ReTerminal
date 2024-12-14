@@ -1,4 +1,4 @@
-package com.termux
+package com.rk.terminal
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -12,8 +12,8 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
-import com.termux.terminal.Terminal
-import com.termux.ui.theme.ReTurmuxTheme
+import com.rk.terminal.terminal.Terminal
+import com.rk.terminal.ui.theme.ReTurmuxTheme
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {

@@ -1,4 +1,4 @@
-package com.termux.ui.theme
+package com.rk.terminal.ui.theme
 
 import androidx.compose.ui.graphics.Color
 

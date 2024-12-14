@@ -1,4 +1,4 @@
-package com.termux.terminal
+package com.rk.terminal.terminal
 
 import androidx.compose.material3.Text
 import android.app.Activity
@@ -26,13 +26,12 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
-import com.termux.terminal.virtualkeys.VirtualKeysConstants
-import com.termux.terminal.virtualkeys.VirtualKeysInfo
-import com.termux.terminal.virtualkeys.VirtualKeysListener
-import com.termux.terminal.virtualkeys.VirtualKeysView
+import com.rk.terminal.terminal.virtualkeys.VirtualKeysConstants
+import com.rk.terminal.terminal.virtualkeys.VirtualKeysInfo
+import com.rk.terminal.terminal.virtualkeys.VirtualKeysListener
+import com.rk.terminal.terminal.virtualkeys.VirtualKeysView
 import com.termux.view.TerminalView
 import kotlinx.coroutines.launch
 import java.lang.ref.WeakReference
@@ -56,7 +55,7 @@ fun Terminal(modifier: Modifier = Modifier) {
         }
     }, content = {
         Scaffold(topBar = {
-            TopAppBar(title = { Text(text = "ReTurmux")}, navigationIcon = {
+            TopAppBar(title = { Text(text = "ReTerminal")}, navigationIcon = {
                 IconButton(onClick = {
                     scope.launch { drawerState.open() }
                     }) {

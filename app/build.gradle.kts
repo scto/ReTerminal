@@ -5,14 +5,13 @@ plugins {
 }
 
 android {
-    namespace = "com.termux"
+    namespace = "com.rk.terminal"
     compileSdk = 34
 
     defaultConfig {
-        applicationId = "com.termux"
+        applicationId = "com.rk.terminal"
         minSdk = 24
-        //noinspection ExpiredTargetSdkVersion
-        targetSdk = 28
+        targetSdk = 36
         versionCode = 218
         versionName = "0.218.0"
 

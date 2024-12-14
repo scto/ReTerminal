@@ -1,4 +1,4 @@
-package com.termux.ui.theme
+package com.rk.terminal.ui.theme
 
 import android.app.Activity
 import android.os.Build

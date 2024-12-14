@@ -1,13 +1,17 @@
-package com.termux.terminal
+package com.rk.terminal.terminal
 
 import android.app.Activity
 import android.util.Log
 import android.view.KeyEvent
 import android.view.MotionEvent
+import com.termux.terminal.TerminalEmulator
+import com.termux.terminal.TerminalSession
+import com.termux.terminal.TerminalSessionClient
 import com.termux.view.TerminalView
 import com.termux.view.TerminalViewClient
 
-class TerminalBackEnd(val terminal: TerminalView,val activity:Activity) : TerminalViewClient, TerminalSessionClient {
+class TerminalBackEnd(val terminal: TerminalView,val activity:Activity) : TerminalViewClient,
+    TerminalSessionClient {
     override fun onTextChanged(changedSession: TerminalSession) {
         terminal.onScreenUpdated()
     }

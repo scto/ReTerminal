@@ -1,7 +1,10 @@
-package com.termux.terminal
+package com.rk.terminal.terminal
 
 import android.app.Activity
 import android.os.Environment
+import com.termux.terminal.TerminalEmulator
+import com.termux.terminal.TerminalSession
+import com.termux.terminal.TerminalSessionClient
 import java.io.File
 
 object MkSession {

@@ -25,5 +25,5 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "ReTurmux"
+rootProject.name = "ReTerminal"
 include(":app")

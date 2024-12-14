@@ -1,4 +1,4 @@
-package com.termux
+package com.terminal
 
 import org.junit.Test
 

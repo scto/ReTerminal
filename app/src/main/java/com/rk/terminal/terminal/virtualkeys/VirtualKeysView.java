@@ -1,4 +1,4 @@
-package com.termux.terminal.virtualkeys;
+package com.rk.terminal.terminal.virtualkeys;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
