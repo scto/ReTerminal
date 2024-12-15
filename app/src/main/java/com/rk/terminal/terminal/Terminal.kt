@@ -69,7 +69,7 @@ fun Terminal(modifier: Modifier = Modifier) {
                         factory = { context ->
                             TerminalView(context, null).apply {
                                 terminalView = WeakReference(this)
-                                setTextSize(14)
+                                setTextSize(23)
                                 val client = TerminalBackEnd(this, activity!!)
                                 setTerminalViewClient(client)
                                 val session = MkSession.createSession(activity, client)
