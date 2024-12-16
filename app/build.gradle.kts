@@ -28,6 +28,42 @@ android {
             )
         }
     }
+
+    signingConfigs {
+        create("release") {
+            val isGITHUB_ACTION = System.getenv("GITHUB_ACTIONS") == "true"
+
+            val propertiesFilePath = if (isGITHUB_ACTION) {
+                "/tmp/signing.properties"
+            } else {
+                "/home/rohit/signing.properties"
+            }
+
+            val propertiesFile = File(propertiesFilePath)
+            if (propertiesFile.exists()) {
+                val properties = Properties()
+                properties.load(propertiesFile.inputStream())
+                keyAlias = properties["keyAlias"] as String?
+                keyPassword = properties["keyPassword"] as String?
+                storeFile = if (isGITHUB_ACTION) {
+                    File("/tmp/xed.keystore")
+                } else {
+                    (properties["storeFile"] as String?)?.let { File(it) }
+                }
+
+                storePassword = properties["storePassword"] as String?
+            } else {
+                println("Signing properties file not found at $propertiesFilePath")
+            }
+        }
+        getByName("debug") {
+            storeFile = file(layout.buildDirectory.dir("../testkey.keystore"))
+            storePassword = "testkey"
+            keyAlias = "testkey"
+            keyPassword = "testkey"
+        }
+    }
+
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_1_8
         targetCompatibility = JavaVersion.VERSION_1_8
