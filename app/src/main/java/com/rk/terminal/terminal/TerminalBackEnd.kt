@@ -4,6 +4,8 @@ import android.app.Activity
 import android.util.Log
 import android.view.KeyEvent
 import android.view.MotionEvent
+import com.blankj.utilcode.util.ClipboardUtils
+import com.blankj.utilcode.util.KeyboardUtils
 import com.termux.terminal.TerminalEmulator
 import com.termux.terminal.TerminalSession
 import com.termux.terminal.TerminalSessionClient
@@ -21,14 +23,14 @@ class TerminalBackEnd(val terminal: TerminalView,val activity:Activity) : Termin
     override fun onSessionFinished(finishedSession: TerminalSession) {}
     
     override fun onCopyTextToClipboard(session: TerminalSession, text: String) {
-        //ClipboardUtils.copyText("Terminal", text)
+        ClipboardUtils.copyText("Terminal", text)
     }
     
     override fun onPasteTextFromClipboard(session: TerminalSession) {
-//        val clip = ClipboardUtils.getText().toString()
-//        if (clip.trim { it <= ' ' }.isNotEmpty() && terminal.mEmulator != null) {
-//            terminal.mEmulator.paste(clip)
-//        }
+        val clip = ClipboardUtils.getText().toString()
+        if (clip.trim { it <= ' ' }.isNotEmpty() && terminal.mEmulator != null) {
+            terminal.mEmulator.paste(clip)
+        }
     }
     
     override fun onBell(session: TerminalSession) {
@@ -155,6 +157,6 @@ class TerminalBackEnd(val terminal: TerminalView,val activity:Activity) : Termin
     
     private fun showSoftInput() {
         terminal.requestFocus()
-       // KeyboardUtils.showSoftInput(terminal)
+        KeyboardUtils.showSoftInput(terminal)
     }
 }
