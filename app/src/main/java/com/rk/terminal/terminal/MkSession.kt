@@ -5,6 +5,11 @@ import android.os.Environment
 import com.termux.terminal.TerminalEmulator
 import com.termux.terminal.TerminalSession
 import com.termux.terminal.TerminalSessionClient
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.io.File
 
 object MkSession {
@@ -33,8 +38,9 @@ object MkSession {
             env.addAll(envVariables.map { "${it.key}=${it.value}" })
             
             val shell = "/system/bin/sh"
+
             val args = arrayOf<String>()
-            
+
             return TerminalSession(
                 shell,
                 filesDir.absolutePath,

@@ -75,7 +75,10 @@ fun Terminal(modifier: Modifier = Modifier) {
                                 val session = MkSession.createSession(activity, client)
                                 attachSession(session)
 
+
                                 post {
+                                    session.write("export PS1='\$(pwd | sed \"s|^\$HOME|~|\")\\\$ '\r")
+                                    session.write("clear \r")
                                     setBackgroundColor(backgroundColor)
                                     keepScreenOn = true
                                     requestFocus()
