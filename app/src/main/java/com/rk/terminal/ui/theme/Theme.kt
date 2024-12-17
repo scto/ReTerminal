@@ -3,6 +3,7 @@ package com.rk.terminal.ui.theme
 import android.app.Activity
 import android.os.Build
 import androidx.annotation.ChecksSdkIntAtLeast
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.dynamicDarkColorScheme
@@ -96,7 +97,7 @@ private val DarkColorScheme =
  */
 @Composable
 fun ReTurmuxTheme(
-    darkTheme: Boolean = true,
+    darkTheme: Boolean = isSystemInDarkTheme(),
     highContrastDarkTheme: Boolean = false,
     dynamicColor: Boolean = true,
     content: @Composable () -> Unit,
