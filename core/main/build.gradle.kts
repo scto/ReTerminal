@@ -33,7 +33,6 @@ fun getFullGitCommitHash(): String {
     return stdout.toString().trim()
 }
 
-
 android {
     namespace = "com.rk.terminal"
     android.buildFeatures.buildConfig = true
@@ -46,6 +45,7 @@ android {
     }
 
     buildTypes {
+        /*
         release {
             buildConfigField("String", "GIT_COMMIT_HASH", "\"${getFullGitCommitHash()}\"")
             buildConfigField("String", "GIT_SHORT_COMMIT_HASH", "\"${getGitCommitHash()}\"")
@@ -56,6 +56,7 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro"
             )
         }
+        */
         debug{
             buildConfigField("String", "GIT_COMMIT_HASH", "\"${getFullGitCommitHash()}\"")
             buildConfigField("String", "GIT_SHORT_COMMIT_HASH", "\"${getGitCommitHash()}\"")
@@ -63,11 +64,11 @@ android {
         }
     }
 
-
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
     }
+    
     kotlinOptions {
         jvmTarget = "17"
     }
@@ -80,8 +81,6 @@ android {
     composeOptions {
         kotlinCompilerExtensionVersion = "1.5.15"
     }
-
-
 }
 
 dependencies {

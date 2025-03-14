@@ -48,7 +48,7 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "Xed-Editor"
+rootProject.name = "ReTerminal"
 include(":app")
 include(":core:main")
 

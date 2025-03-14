@@ -18,6 +18,7 @@ android {
     }
     
     signingConfigs {
+        /*
         create("release") {
             val isGITHUB_ACTION = System.getenv("GITHUB_ACTIONS") == "true"
             
@@ -44,6 +45,7 @@ android {
                 println("Signing properties file not found at $propertiesFilePath")
             }
         }
+        */
         getByName("debug") {
             storeFile = file(layout.buildDirectory.dir("../testkey.keystore"))
             storePassword = "testkey"
@@ -54,6 +56,7 @@ android {
     
     
     buildTypes {
+        /*
         release{
             isMinifyEnabled = false
             isCrunchPngs = false
@@ -64,6 +67,7 @@ android {
             signingConfig = signingConfigs.getByName("release")
             resValue("string","app_name","ReTerminal")
         }
+        */
         debug{
             applicationIdSuffix = ".debug"
             versionNameSuffix = "-DEBUG"
@@ -98,9 +102,11 @@ android {
     kotlinOptions {
         jvmTarget = "17"
     }
+    
     composeOptions {
         kotlinCompilerExtensionVersion = "1.5.15"
     }
+    
     packaging {
         jniLibs {
             useLegacyPackaging = true
