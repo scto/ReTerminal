@@ -1,10 +1,16 @@
 package com.rk.terminal.ui.screens.terminal
 
+import android.content.res.Configuration
+import android.content.res.Resources
+import android.media.MediaPlayer
 import android.util.Log
 import android.view.KeyEvent
 import android.view.MotionEvent
+import androidx.lifecycle.lifecycleScope
 import com.blankj.utilcode.util.ClipboardUtils
 import com.blankj.utilcode.util.KeyboardUtils
+import com.rk.libcommons.child
+import com.rk.libcommons.createFileIfNot
 import com.rk.libcommons.dpToPx
 import com.rk.settings.Settings
 import com.rk.terminal.ui.activities.terminal.MainActivity
@@ -15,13 +21,20 @@ import com.termux.terminal.TerminalSession
 import com.termux.terminal.TerminalSessionClient
 import com.termux.view.TerminalView
 import com.termux.view.TerminalViewClient
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import java.io.File
+import java.io.FileOutputStream
 
 class TerminalBackEnd(val terminal: TerminalView,val activity: MainActivity) : TerminalViewClient, TerminalSessionClient {
     override fun onTextChanged(changedSession: TerminalSession) {
         terminal.onScreenUpdated()
     }
     
-    override fun onTitleChanged(changedSession: TerminalSession) {}
+    override fun onTitleChanged(changedSession: TerminalSession) {
+
+    }
     
     override fun onSessionFinished(finishedSession: TerminalSession) {
 
@@ -39,7 +52,30 @@ class TerminalBackEnd(val terminal: TerminalView,val activity: MainActivity) : T
     }
     
     override fun onBell(session: TerminalSession) {
+        if (Settings.bell){
+            activity.lifecycleScope.launch{
+                val bellFile = activity.cacheDir.child("bell.oga")
+                if (bellFile.exists().not()){
+                    bellFile.createNewFile()
+                    withContext(Dispatchers.IO){
+                        activity.assets.open("bell.oga").use { assetIS ->
+                            FileOutputStream(bellFile).use { bellFileOutS ->
+                                assetIS.copyTo(bellFileOutS)
+                            }
+                        }
+                    }
 
+                }
+
+                val mediaPlayer = MediaPlayer()
+                mediaPlayer.setOnCompletionListener{
+                    it?.release()
+                }
+                mediaPlayer.setDataSource(bellFile.absolutePath)
+                mediaPlayer.prepare()
+                mediaPlayer.start()
+            }
+        }
     }
     
     override fun onColorsChanged(session: TerminalSession) {}
@@ -78,13 +114,24 @@ class TerminalBackEnd(val terminal: TerminalView,val activity: MainActivity) : T
     override fun logStackTrace(tag: String?, e: Exception?) {
         e?.printStackTrace()
     }
-    
+
     override fun onScale(scale: Float): Float {
-        return dpToPx(Settings.terminal_font_size.toFloat(),terminal.context).toFloat()
+        val fontScale = scale.coerceIn(11f, 45f)
+        terminal.setTextSize(fontScale.toInt())
+        return fontScale
     }
-    
+
+    val isHardwareKeyboardConnected: Boolean
+        get() {
+            val config = Resources.getSystem().configuration
+            return config.keyboard != Configuration.KEYBOARD_NOKEYS
+        }
+
+
     override fun onSingleTapUp(e: MotionEvent) {
-        showSoftInput()
+        if (!(isHardwareKeyboardConnected && Settings.hide_soft_keyboard_if_hwd)){
+            showSoftInput()
+        }
     }
     
     override fun shouldBackButtonBeMappedToEscape(): Boolean {
@@ -107,11 +154,11 @@ class TerminalBackEnd(val terminal: TerminalView,val activity: MainActivity) : T
     
     override fun onKeyDown(keyCode: Int, e: KeyEvent, session: TerminalSession): Boolean {
         if (keyCode == KeyEvent.KEYCODE_ENTER && !session.isRunning) {
-            activity.sessionBinder?.terminateSession(activity.sessionBinder!!.getService().currentSession.value)
+            activity.sessionBinder?.terminateSession(activity.sessionBinder!!.getService().currentSession.value.first)
             if (activity.sessionBinder!!.getService().sessionList.isEmpty()){
                 activity.finish()
             }else{
-                changeSession(activity,activity.sessionBinder!!.getService().sessionList.first())
+                changeSession(activity,activity.sessionBinder!!.getService().sessionList.keys.first())
             }
             return true
         }
@@ -128,25 +175,25 @@ class TerminalBackEnd(val terminal: TerminalView,val activity: MainActivity) : T
     
     // keys
     override fun readControlKey(): Boolean {
-        val state = activity.findViewById<VirtualKeysView>(virtualKeysId).readSpecialButton(
+        val state = virtualKeysView.get()?.readSpecialButton(
             SpecialButton.CTRL, true)
         return state != null && state
     }
     
     override fun readAltKey(): Boolean {
-       val state = activity.findViewById<VirtualKeysView>(virtualKeysId).readSpecialButton(
+       val state = virtualKeysView.get()?.readSpecialButton(
            SpecialButton.ALT, true)
         return state != null && state
     }
     
     override fun readShiftKey(): Boolean {
-        val state = activity.findViewById<VirtualKeysView>(virtualKeysId).readSpecialButton(
+        val state = virtualKeysView.get()?.readSpecialButton(
             SpecialButton.SHIFT, true)
         return state != null && state
     }
     
     override fun readFnKey(): Boolean {
-        val state = activity.findViewById<VirtualKeysView>(virtualKeysId).readSpecialButton(
+        val state = virtualKeysView.get()?.readSpecialButton(
             SpecialButton.FN, true)
         return state != null && state
     }
