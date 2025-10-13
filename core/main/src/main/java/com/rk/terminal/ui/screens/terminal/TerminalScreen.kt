@@ -8,8 +8,11 @@ import android.graphics.Color
 import android.graphics.Typeface
 import android.os.Build
 import android.util.TypedValue
+import android.view.KeyEvent
 import android.view.View
 import android.view.Window
+import android.view.inputmethod.EditorInfo
+import android.widget.EditText
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.foundation.Image
@@ -31,6 +34,8 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
@@ -63,6 +68,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -75,6 +81,7 @@ import androidx.compose.ui.graphics.BlendMode
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.drawscope.clipRect
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.LocalConfiguration
@@ -94,6 +101,7 @@ import androidx.compose.ui.zIndex
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
+import androidx.core.widget.doOnTextChanged
 import androidx.navigation.NavController
 import androidx.palette.graphics.Palette
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
@@ -538,56 +546,105 @@ fun TerminalScreen(
                                 )
 
                                 if (showVirtualKeys.value){
-                                    AndroidView(update = {
-                                        it.apply {
-                                            virtualKeysViewClient =
-                                                terminalView.get()?.mTermSession?.let {
-                                                    VirtualKeysListener(
-                                                        it
-                                                    )
-                                                }
-
-
-                                            buttonTextColor = getViewColor()
-
-
-                                            reload(
-                                                VirtualKeysInfo(
-                                                    VIRTUAL_KEYS,
-                                                    "",
-                                                    VirtualKeysConstants.CONTROL_CHARS_ALIASES
-                                                )
-                                            )
-                                        }
-                                    },
-                                        factory = { context ->
-                                            VirtualKeysView(context, null).apply {
-                                                virtualKeysView = WeakReference(this)
-
-                                                virtualKeysViewClient =
-                                                    terminalView.get()?.mTermSession?.let {
-                                                        VirtualKeysListener(
-                                                            it
-                                                        )
-                                                    }
-
-
-                                                buttonTextColor = getViewColor()
-
-
-                                                reload(
-                                                    VirtualKeysInfo(
-                                                        VIRTUAL_KEYS,
-                                                        "",
-                                                        VirtualKeysConstants.CONTROL_CHARS_ALIASES
-                                                    )
-                                                )
-                                            }
-                                        },
+                                    val pagerState = rememberPagerState(pageCount = { 2 })
+                                    val onSurfaceColor = MaterialTheme.colorScheme.onSurface.toArgb()
+                                    HorizontalPager(
+                                        state = pagerState,
                                         modifier = Modifier
                                             .fillMaxWidth()
                                             .height(75.dp)
-                                    )
+                                    ) { page ->
+                                        when (page) {
+                                            0 -> {
+                                                terminalView.get()?.requestFocus()
+                                                //terminalView.get()?.requestFocusFromTouch()
+                                                AndroidView(
+                                                    factory = { context ->
+                                                        VirtualKeysView(context, null).apply {
+                                                            virtualKeysView = WeakReference(this)
+                                                            virtualKeysViewClient =
+                                                                terminalView.get()?.mTermSession?.let {
+                                                                    VirtualKeysListener(
+                                                                        it
+                                                                    )
+                                                                }
+
+                                                            buttonTextColor = onSurfaceColor!!
+
+                                                            reload(
+                                                                VirtualKeysInfo(
+                                                                    VIRTUAL_KEYS,
+                                                                    "",
+                                                                    VirtualKeysConstants.CONTROL_CHARS_ALIASES
+                                                                )
+                                                            )
+                                                        }
+                                                    },
+                                                    modifier = Modifier
+                                                        .fillMaxWidth()
+                                                        .height(75.dp)
+                                                )
+                                            }
+
+                                            1 -> {
+                                                var text by rememberSaveable { mutableStateOf("") }
+
+                                                AndroidView(
+                                                    modifier = Modifier
+                                                        .fillMaxWidth()
+                                                        .height(75.dp),
+                                                    factory = { ctx ->
+                                                        EditText(ctx).apply {
+                                                            maxLines = 1
+                                                            isSingleLine = true
+                                                            imeOptions = EditorInfo.IME_ACTION_DONE
+
+                                                            // Listen for text changes to update Compose state
+                                                            doOnTextChanged { textInput, _, _, _ ->
+                                                                text = textInput.toString()
+                                                            }
+
+                                                            setOnEditorActionListener { v, actionId, event ->
+                                                                if (actionId == EditorInfo.IME_ACTION_DONE) {
+                                                                    if (text.isEmpty()) {
+                                                                        // Dispatch enter key events if text is empty
+                                                                        val eventDown = KeyEvent(
+                                                                            KeyEvent.ACTION_DOWN,
+                                                                            KeyEvent.KEYCODE_ENTER
+                                                                        )
+                                                                        val eventUp = KeyEvent(
+                                                                            KeyEvent.ACTION_UP,
+                                                                            KeyEvent.KEYCODE_ENTER
+                                                                        )
+                                                                        terminalView.get()
+                                                                            ?.dispatchKeyEvent(eventDown)
+                                                                        terminalView.get()
+                                                                            ?.dispatchKeyEvent(eventUp)
+                                                                    } else {
+                                                                        terminalView.get()?.currentSession?.write(
+                                                                            text
+                                                                        )
+                                                                        setText("")
+                                                                    }
+                                                                    true
+                                                                } else {
+                                                                    false
+                                                                }
+                                                            }
+                                                        }
+                                                    },
+                                                    update = { editText ->
+                                                        // Keep EditText's text in sync with Compose state, avoid infinite loop by only updating if different
+                                                        if (editText.text.toString() != text) {
+                                                            editText.setText(text)
+                                                            editText.setSelection(text.length)
+                                                        }
+                                                    }
+                                                )
+                                            }
+                                        }
+
+                                    }
                                 }else{
                                     virtualKeysView = WeakReference(null)
                                 }
